@@ -21,7 +21,7 @@
 - [❕ Features Excluded from MVP](#-5-features-excluded-from-mvp)
 
 ---
-## 🎯 1. Project goal
+## 🎯 Project goal
 
 Pet Nutrition Tracker is a backend application for tracking pets’ food intake, feeding history, and weight changes.
 
