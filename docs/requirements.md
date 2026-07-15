@@ -1,12 +1,33 @@
-# Pet Nutrition Tracker API
+# 🐱 Pet Nutrition Tracker API
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+---
 
-## 1. Project goal
+## 📑 Table of Contents
+
+- [🎯 Project Goal](#-1-project-goal)
+- [👤 Target Users](#-2-target-users)
+- [🚀 MVP Functionality](#-3-mvp-functionality)
+    - [Authentication](#authentication)
+    - [Pets](#pets)
+    - [Foods](#foods)
+    - [Feeding Records](#feeding-records)
+    - [Optional Weight Recording](#optional-weight-recording)
+    - [Daily Summary](#daily-summary)
+    - [Weight History](#weight-history)
+- [📋 Main Business Rules](#-4-main-business-rules)
+- [❕ Features Excluded from MVP](#-5-features-excluded-from-mvp)
+
+---
+## 🎯 1. Project goal
 
 Pet Nutrition Tracker is a backend application for tracking pets’ food intake, feeding history, and weight changes.
 
 The application allows pet owners to record what and when their pets ate, monitor daily food intake, and optionally add the pet’s current weight.
 
-## 2. Target users
+## 👤 Target users
 
 The application is intended for pet owners who want to:
 
@@ -16,7 +37,7 @@ The application is intended for pet owners who want to:
 * monitor weight changes;
 * manage information about several pets.
 
-## 3. MVP functionality
+## 🚀 MVP functionality
 
 ### Authentication
 
@@ -109,7 +130,7 @@ The user can:
 * view the latest recorded weight;
 * delete an incorrect weight record.
 
-## 4. Main business rules
+## 📋 Main business rules
 
 * A user can access only their own pets, foods, feeding records, and weight records.
 * A feeding record must belong to an existing pet.
@@ -122,7 +143,7 @@ The user can:
 * Feeding and optional weight must be saved in one transaction when submitted through one combined API request.
 * If saving the optional weight fails, the feeding record must also be rolled back.
 
-## 5. Features excluded from MVP
+## ❕ Features excluded from MVP
 
 The first version will not include:
 
