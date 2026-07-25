@@ -1,5 +1,7 @@
 # 🐾 Pet Nutrition Tracker API
-
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Status](https://img.shields.io/badge/status-in%20development-yellow)
 ## About
 
 Pet Nutrition Tracker API is a RESTful backend application that helps pet owners track their pets' daily nutrition.
