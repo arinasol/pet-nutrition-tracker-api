@@ -1,6 +1,7 @@
 package com.kaori.petnutritiontracker.auth;
 
 import com.kaori.petnutritiontracker.user.UserService;
+import com.kaori.petnutritiontracker.user.dto.LoginRequest;
 import com.kaori.petnutritiontracker.user.dto.RegisterRequest;
 import com.kaori.petnutritiontracker.user.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -21,5 +22,12 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
         return userService.register(request);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        return userService.login(request);
     }
 }

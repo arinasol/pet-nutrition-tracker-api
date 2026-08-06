@@ -1,5 +1,8 @@
 package com.kaori.petnutritiontracker.user;
 
+import com.kaori.petnutritiontracker.auth.AuthResponse;
+import com.kaori.petnutritiontracker.auth.JwtService;
+import com.kaori.petnutritiontracker.user.dto.LoginRequest;
 import com.kaori.petnutritiontracker.user.dto.RegisterRequest;
 import com.kaori.petnutritiontracker.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -40,6 +44,34 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return toResponse(savedUser);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Invalid email or password"
+                ));
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.password(),
+                user.getPassword()
+        );
+
+        if (!passwordMatches) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid email or password"
+            );
+        }
+
+        String accessToken = jwtService.generateToken(user.getEmail());
+
+        return new AuthResponse(
+                accessToken,
+                "Bearer",
+                toResponse(user)
+        );
     }
 
     public UserResponse findById(Long id) {
