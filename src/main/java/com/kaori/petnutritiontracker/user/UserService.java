@@ -5,6 +5,7 @@ import com.kaori.petnutritiontracker.auth.JwtService;
 import com.kaori.petnutritiontracker.user.dto.LoginRequest;
 import com.kaori.petnutritiontracker.user.dto.RegisterRequest;
 import com.kaori.petnutritiontracker.user.dto.UserResponse;
+import com.kaori.petnutritiontracker.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -43,7 +44,7 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return toResponse(savedUser);
+        return userMapper.toResponse(savedUser);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -70,13 +71,22 @@ public class UserService {
         return new AuthResponse(
                 accessToken,
                 "Bearer",
-                toResponse(user)
+                userMapper.toResponse(user)
         );
     }
 
     public UserResponse findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", id)));
-        return toResponse(user);
+        return userMapper.toResponse(user);
+    }
+    public UserResponse getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
+                ));
+
+        return userMapper.toResponse(user);
     }
 
     public User save(User user) {
@@ -85,13 +95,5 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
-    }
-    private UserResponse toResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getCreatedAt()
-        );
     }
 }
