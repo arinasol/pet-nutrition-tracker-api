@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -24,10 +23,6 @@ public class UserService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ResponseStatusException(
@@ -36,13 +31,7 @@ public class UserService {
             );
         }
 
-        User user = new User();
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setCreatedAt(LocalDateTime.now());
-
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(createUser(request));
 
         return userMapper.toResponse(savedUser);
     }
@@ -54,12 +43,11 @@ public class UserService {
                         "Invalid email or password"
                 ));
 
-        boolean passwordMatches = passwordEncoder.matches(
+
+        if (!passwordEncoder.matches(
                 request.password(),
                 user.getPassword()
-        );
-
-        if (!passwordMatches) {
+        )) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
                     "Invalid email or password"
@@ -75,10 +63,6 @@ public class UserService {
         );
     }
 
-    public UserResponse findById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", id)));
-        return userMapper.toResponse(user);
-    }
     public UserResponse getCurrentUser(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -89,11 +73,15 @@ public class UserService {
         return userMapper.toResponse(user);
     }
 
-    public User save(User user) {
-        return userRepository.save(user);
-    }
+    private User createUser(RegisterRequest request) {
 
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        User user = new User();
+
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setCreatedAt(LocalDateTime.now());
+
+        return user;
     }
 }
