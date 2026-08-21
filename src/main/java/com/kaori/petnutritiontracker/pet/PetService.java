@@ -2,6 +2,7 @@ package com.kaori.petnutritiontracker.pet;
 
 import com.kaori.petnutritiontracker.pet.dto.CreatePetRequest;
 import com.kaori.petnutritiontracker.pet.dto.PetResponse;
+import com.kaori.petnutritiontracker.pet.dto.UpdatePetRequest;
 import com.kaori.petnutritiontracker.pet.mapper.PetMapper;
 import com.kaori.petnutritiontracker.user.User;
 import com.kaori.petnutritiontracker.user.UserRepository;
@@ -32,6 +33,34 @@ public class PetService {
         Pet savedPet = petRepository.save(pet);
 
         return petMapper.toResponse(savedPet);
+    }
+
+    public PetResponse updatePet(
+            Long id,
+            UpdatePetRequest request,
+            String ownerEmail
+    ) {
+        Pet pet = petRepository.findByIdAndOwnerEmail(id, ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Pet not found"
+                ));
+
+        updatePetFromRequest(pet, request);
+
+        Pet updatedPet = petRepository.save(pet);
+
+        return petMapper.toResponse(updatedPet);
+    }
+
+    public void deletePet(Long id, String ownerEmail) {
+        Pet pet = petRepository.findByIdAndOwnerEmail(id, ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Pet not found"
+                ));
+
+        petRepository.delete(pet);
     }
 
     public List<PetResponse> getAllPets(String ownerEmail) {
@@ -67,5 +96,13 @@ public class PetService {
         pet.setOwner(owner);
 
         return pet;
+    }
+    private void updatePetFromRequest(Pet pet, UpdatePetRequest request) {
+        pet.setName(request.name());
+        pet.setBreed(request.breed());
+        pet.setBirthDate(request.birthDate());
+        pet.setSpecies(request.species());
+        pet.setSex(request.sex());
+        pet.setDailyFoodTargetGrams(request.dailyFoodTargetGrams());
     }
 }
