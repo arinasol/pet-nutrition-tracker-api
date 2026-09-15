@@ -2,6 +2,7 @@ package com.kaori.petnutritiontracker.feedinglog;
 
 import com.kaori.petnutritiontracker.feedinglog.dto.CreateFeedingLogRequest;
 import com.kaori.petnutritiontracker.feedinglog.dto.FeedingLogResponse;
+import com.kaori.petnutritiontracker.feedinglog.dto.UpdateFeedingLogRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,31 @@ public class FeedingLogController {
             Authentication authentication
     ) {
         return feedingLogService.getById(
+                id,
+                authentication.getName()
+        );
+    }
+
+    @PutMapping("/{id}")
+    public FeedingLogResponse updateFeedingLog(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateFeedingLogRequest request,
+            Authentication authentication
+    ) {
+        return feedingLogService.updateFeedingLog(
+                id,
+                request,
+                authentication.getName()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFeedingLog(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        feedingLogService.deleteFeedingLog(
                 id,
                 authentication.getName()
         );

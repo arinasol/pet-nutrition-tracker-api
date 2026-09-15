@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.kaori.petnutritiontracker.feedinglog.dto.UpdateFeedingLogRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,6 +83,46 @@ public class FeedingLogService {
         return feedingLogMapper.toResponse(feedingLog);
     }
 
+    public FeedingLogResponse updateFeedingLog(
+            Long id,
+            UpdateFeedingLogRequest request,
+            String ownerEmail
+    ) {
+        FeedingLog feedingLog = feedingLogRepository
+                .findByIdAndPetOwnerEmail(id, ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Feeding log not found"
+                ));
+
+        Food food = foodRepository
+                .findByIdAndOwnerEmail(request.foodId(), ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Food not found"
+                ));
+
+        updateFromRequest(feedingLog, request, food);
+
+        FeedingLog updatedLog = feedingLogRepository.save(feedingLog);
+
+        return feedingLogMapper.toResponse(updatedLog);
+    }
+
+    public void deleteFeedingLog(
+            Long id,
+            String ownerEmail
+    ) {
+        FeedingLog feedingLog = feedingLogRepository
+                .findByIdAndPetOwnerEmail(id, ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Feeding log not found"
+                ));
+
+        feedingLogRepository.delete(feedingLog);
+    }
+
     private FeedingLog createFromRequest(
             CreateFeedingLogRequest request,
             Pet pet,
@@ -97,5 +138,15 @@ public class FeedingLogService {
         feedingLog.setCreatedAt(LocalDateTime.now());
 
         return feedingLog;
+    }
+    private void updateFromRequest(
+            FeedingLog feedingLog,
+            UpdateFeedingLogRequest request,
+            Food food
+    ) {
+        feedingLog.setFood(food);
+        feedingLog.setAmountGrams(request.amountGrams());
+        feedingLog.setFedAt(request.fedAt());
+        feedingLog.setNotes(request.notes());
     }
 }
