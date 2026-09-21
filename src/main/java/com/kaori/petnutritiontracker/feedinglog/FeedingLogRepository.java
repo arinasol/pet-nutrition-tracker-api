@@ -19,7 +19,7 @@ public interface FeedingLogRepository extends JpaRepository<FeedingLog, Long> {
     );
 
     /// today eaten grams, daily target, remaining grams
-    List<FeedingLog> findAllByPetIdAndPetOwnerEmailAndFedAtBetween(
+    List<FeedingLog> findAllByPetIdAndPetOwnerEmailAndFedAtGreaterThanEqualAndFedAtLessThan(
             Long petId,
             String ownerEmail,
             LocalDateTime start,

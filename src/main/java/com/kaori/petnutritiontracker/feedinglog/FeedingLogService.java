@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import com.kaori.petnutritiontracker.feedinglog.dto.UpdateFeedingLogRequest;
+import com.kaori.petnutritiontracker.feedinglog.dto.DailySummaryResponse;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -121,6 +124,46 @@ public class FeedingLogService {
                 ));
 
         feedingLogRepository.delete(feedingLog);
+    }
+
+    public DailySummaryResponse getDailySummary(
+            Long petId,
+            LocalDate date,
+            String ownerEmail
+    ) {
+        Pet pet = petRepository.findByIdAndOwnerEmail(petId, ownerEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Pet not found"
+                ));
+
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+
+        List<FeedingLog> logs = feedingLogRepository
+                .findAllByPetIdAndPetOwnerEmailAndFedAtGreaterThanEqualAndFedAtLessThan(
+                        petId,
+                        ownerEmail,
+                        start,
+                        end
+                );
+
+        BigDecimal eatenGrams = logs.stream()
+                .map(FeedingLog::getAmountGrams)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal targetGrams = pet.getDailyFoodTargetGrams();
+
+        BigDecimal remainingGrams = targetGrams.subtract(eatenGrams);
+
+        return new DailySummaryResponse(
+                pet.getId(),
+                pet.getName(),
+                date,
+                targetGrams,
+                eatenGrams,
+                remainingGrams
+        );
     }
 
     private FeedingLog createFromRequest(

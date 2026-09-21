@@ -1,6 +1,7 @@
 package com.kaori.petnutritiontracker.feedinglog;
 
 import com.kaori.petnutritiontracker.feedinglog.dto.CreateFeedingLogRequest;
+import com.kaori.petnutritiontracker.feedinglog.dto.DailySummaryResponse;
 import com.kaori.petnutritiontracker.feedinglog.dto.FeedingLogResponse;
 import com.kaori.petnutritiontracker.feedinglog.dto.UpdateFeedingLogRequest;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -73,6 +75,19 @@ public class FeedingLogController {
     ) {
         feedingLogService.deleteFeedingLog(
                 id,
+                authentication.getName()
+        );
+    }
+
+    @GetMapping("/pet/{petId}/daily-summary")
+    public DailySummaryResponse getDailySummary(
+            @PathVariable Long petId,
+            @RequestParam LocalDate date,
+            Authentication authentication
+    ) {
+        return feedingLogService.getDailySummary(
+                petId,
+                date,
                 authentication.getName()
         );
     }
