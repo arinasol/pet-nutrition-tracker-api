@@ -20,4 +20,4 @@ jobs:
           cache: maven
 
       - name: Run unit tests
-        run: ./mvnw -B -Dtest=PetServiceTest,AiErrorHandlerTest test
+        run: bash ./mvnw -B -Dtest=PetServiceTest,AiErrorHandlerTest test
