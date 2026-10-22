@@ -8,6 +8,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.stream.Collectors;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import com.kaori.petnutritiontracker.ai.AiServiceException;
+import java.util.Map;
 
 import java.time.LocalDateTime;
 
@@ -68,5 +70,19 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(error);
+    }
+    @ExceptionHandler(AiServiceException.class)
+    public ResponseEntity<Map<String, Object>> handleAiServiceException(
+            AiServiceException exception
+    ) {
+        Map<String, Object> body = Map.of(
+                "status", exception.getStatus().value(),
+                "error", exception.getStatus().name(),
+                "message", exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(exception.getStatus())
+                .body(body);
     }
 }
